@@ -1,7 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Message extends Entity {
+public class Message extends Entity<Message> {
     private String message;
+
+    protected Message(Message entity) {
+        super(entity);
+        this.message = entity.message;
+    }
 
     public Message(String message) {
         super();
@@ -16,5 +21,10 @@ public class Message extends Entity {
     public void update(String message) {
         this.message = message;
         updateTime();
+    }
+
+    @Override
+    public Message copy() {
+        return new Message(this);
     }
 }
