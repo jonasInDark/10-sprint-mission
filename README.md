@@ -16,8 +16,8 @@
   - Message
   - 공통
     - id(UUID)
-    - createdAt(long)
-    - updatedAt(long)
+    - createdAt(long, unix timestamp)
+    - updatedAt(long, unix timestamp)
   - getter/update 구현
 - 서비스 설계
   - 도메인 모델별 CRUD 기능을 인터페이스로 정의
@@ -28,3 +28,18 @@
   - 조회
   - 수정 및 검사
   - 삭제 및 검사
+
+### 구현
+
+- entity
+  - `Entity` 아래 3가지 entity 의 공통 기능 구현
+    - DTO class
+    - copy: data integrity
+    - update: userId, channelId, message 변경
+    - uuid, createdAt, updatedAt 은 외부 요청에 의해 변경할 이유가 없으므로 getter 만 구현
+  - `User`
+    - userId: user 들에게 보여지는 이름, 변경 가능하며 동일한 id 도 가능
+  - `Channel`
+    - channelId: channel 이름, 변경 가능
+  - `Message`
+    - message: 수정 가능
