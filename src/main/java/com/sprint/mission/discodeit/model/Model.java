@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.model;
 
 import com.sprint.mission.discodeit.entity.Entity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class Model<T extends Entity<T>> {
     private final Map<UUID, T> data;
@@ -18,7 +15,7 @@ public class Model<T extends Entity<T>> {
         this.data = data;
     }
 
-    public boolean contain(UUID key) {
+    public boolean containsKey(UUID key) {
         return data.containsKey(key);
     }
 
@@ -28,7 +25,9 @@ public class Model<T extends Entity<T>> {
 
     public List<T> getAll(List<UUID> keys) {
         return keys.stream()
-                .map(key -> data.computeIfPresent(key, (uuid, entity) -> entity))
+                .map(key -> Optional.ofNullable(data.get(key)))
+                .flatMap(Optional::stream)
+                .map(T::copy)
                 .toList();
     }
 

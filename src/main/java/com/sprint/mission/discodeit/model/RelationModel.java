@@ -2,10 +2,7 @@ package com.sprint.mission.discodeit.model;
 
 import com.sprint.mission.discodeit.entity.Entity;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class RelationModel<T extends Entity<T>, U extends Entity<U>> {
     private final Map<UUID, List<UUID>> data;
@@ -18,8 +15,12 @@ public class RelationModel<T extends Entity<T>, U extends Entity<U>> {
         this.data = data;
     }
 
-    public boolean contain(UUID key) {
+    public boolean containsKey(UUID key) {
         return data.containsKey(key);
+    }
+
+    public void initKey(UUID key) {
+        data.put(key, new ArrayList<>());
     }
 
     public void add(UUID key, UUID value) {
@@ -27,12 +28,12 @@ public class RelationModel<T extends Entity<T>, U extends Entity<U>> {
     }
 
     public void remove(UUID key, UUID value) {
-        data.get(key).remove(value);
+        get(key, false).remove(value);
     }
 
     private List<UUID> get(UUID key, boolean isCopy) {
         if (isCopy) {
-            return get(key);
+            return List.copyOf(data.get(key));
         }
         return data.get(key);
     }
