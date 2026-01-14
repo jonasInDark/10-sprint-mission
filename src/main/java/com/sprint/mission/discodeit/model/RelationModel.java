@@ -31,11 +31,12 @@ public class RelationModel<T extends Entity<T>, U extends Entity<U>> {
         get(key, false).remove(value);
     }
 
+    public void removeKey(UUID key) {
+        data.remove(key);
+    }
+
     private List<UUID> get(UUID key, boolean isCopy) {
-        if (isCopy) {
-            return List.copyOf(data.get(key));
-        }
-        return data.get(key);
+        return isCopy ? List.copyOf(data.get(key)) : data.get(key);
     }
 
     public List<UUID> get(UUID key) {
