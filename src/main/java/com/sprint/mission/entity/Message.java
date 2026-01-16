@@ -7,7 +7,7 @@ public class Message extends Entity {
     private final UUID userId;
     private final UUID channelId;
 
-    public Message(String message, UUID userId, UUID channelId) {
+    public Message(UUID userId, UUID channelId, String message) {
         super(message);
         this.userId = Objects.requireNonNull(userId);
         this.channelId = Objects.requireNonNull(channelId);

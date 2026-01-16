@@ -5,5 +5,5 @@ import com.sprint.mission.entity.Message;
 import java.util.UUID;
 
 public interface MessageService extends BaseService<Message> {
-    Message create(String content, UUID userId, UUID channelId);
+    Message create(UUID userId, UUID channelId, String content);
 }
