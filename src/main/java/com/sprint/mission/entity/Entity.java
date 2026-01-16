@@ -1,5 +1,6 @@
 package com.sprint.mission.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Entity {
@@ -9,7 +10,7 @@ public abstract class Entity {
     private long updatedAt;
 
     public Entity(String value) {
-        this.value = value;
+        this.value = Objects.requireNonNull(value);
         this.id = UUID.randomUUID();
         this.createdAt = getUnixTimestamp();
         this.updatedAt = createdAt;

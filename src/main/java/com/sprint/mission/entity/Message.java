@@ -1,5 +1,6 @@
 package com.sprint.mission.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Message extends Entity {
@@ -8,8 +9,8 @@ public class Message extends Entity {
 
     public Message(String message, UUID userId, UUID channelId) {
         super(message);
-        this.userId = userId;
-        this.channelId = channelId;
+        this.userId = Objects.requireNonNull(userId);
+        this.channelId = Objects.requireNonNull(channelId);
     }
 
     public String getMessage() {
