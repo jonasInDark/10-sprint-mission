@@ -2,13 +2,13 @@ package com.sprint.mission;
 
 import com.sprint.mission.entity.User;
 import com.sprint.mission.service.UserService;
-import com.sprint.mission.service.jcf.JCFUserService;
+import com.sprint.mission.service.jcf.JCFServiceFactory;
 
 import java.util.UUID;
 
 public class JavaApplication {
     public static void testUserService() {
-        UserService userService = new JCFUserService();
+        UserService userService = JCFServiceFactory.getUserService();
 
         User user1 = userService.create("jonas");
         System.out.printf("user id: %s, name: %s%n", user1.getId(), user1.getUserName());
