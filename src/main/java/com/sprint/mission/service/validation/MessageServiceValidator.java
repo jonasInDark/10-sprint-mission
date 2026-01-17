@@ -18,8 +18,8 @@ public class MessageServiceValidator implements ServiceValidator<SendMsgVerifica
 
     @Override
     public void validateIdExist(SendMsgVerificationRequest request) {
-        check(userService, request.getUserId(), "User");
-        check(channelService, request.getChannelId(), "Channel");
+        check(userService, request.userId(), "User");
+        check(channelService, request.channelId(), "Channel");
     }
 
     private void check(BaseService<?> service, UUID id, String entity) {

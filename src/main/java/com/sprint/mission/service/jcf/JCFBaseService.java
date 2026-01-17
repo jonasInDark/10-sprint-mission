@@ -6,7 +6,7 @@ import com.sprint.mission.service.BaseService;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class JCFBaseService<T extends Entity> implements BaseService<T> {
+public abstract class JCFBaseService<T extends Entity<T>> implements BaseService<T> {
     private final Map<UUID, T> data;
     private final String idNotExistMessage = "don't exist, %s";
 

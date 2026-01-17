@@ -1,12 +1,13 @@
 package com.sprint.mission.service.jcf;
 
 import com.sprint.mission.dto.SendMsgVerificationRequest;
+import com.sprint.mission.entity.Channel;
 import com.sprint.mission.entity.Message;
+import com.sprint.mission.entity.User;
 import com.sprint.mission.service.MessageService;
 import com.sprint.mission.service.validation.MessageServiceValidator;
 
 import java.util.Objects;
-import java.util.UUID;
 
 public class JCFMessageService extends JCFBaseService<Message> implements MessageService {
     private static MessageService instance;
@@ -29,11 +30,11 @@ public class JCFMessageService extends JCFBaseService<Message> implements Messag
     }
 
     @Override
-    public Message create(UUID userId, UUID channelId, String content) {
+    public Message create(User user, Channel channel, String content) {
         validator.validateIdExist(
-                SendMsgVerificationRequest.of(userId, channelId)
+                new SendMsgVerificationRequest(user.getId(), channel.getId())
         );
-        Message message = new Message(userId, channelId, content);
+        Message message = new Message(user, channel, content);
         getData().put(message.getId(), message);
         return message;
     }

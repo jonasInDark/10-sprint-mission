@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
-public interface BaseService<T extends Entity> {
+public interface BaseService<T extends Entity<T>> {
     T get(UUID id);
     <U extends Collection<UUID>> Map<UUID, T> getAll(U ids);
     void update(UUID id, String newValue);
