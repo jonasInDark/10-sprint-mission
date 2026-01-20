@@ -12,8 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class FileBaseService<T extends Entity<T>> implements BaseService<T>, Serializable {
-    private static final long serialVersionUID = 20260120L;
+public abstract class FileBaseService<T extends Entity<T>> implements BaseService<T> {
     private final Path saveDirectory;
     private final String extension;
     private final String ID_NOT_FOUND_MSG = "%s id not found, %s";
