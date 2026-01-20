@@ -10,15 +10,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public abstract class FileBaseService<T extends Entity<T>, U extends BaseService<T>> implements BaseService<T>, Serializable {
+public abstract class FileBaseService<T extends Entity<T>> implements BaseService<T>, Serializable {
     private static final long serialVersionUID = 20260120L;
     private final Path saveDirectory;
     private final String extension;
-    transient private final U service;
+    private final String ID_NOT_FOUND_MSG = "%s id not found, %s";
 
-    public FileBaseService(U service, String extension) {
-        this.service = service;
+    public FileBaseService(String extension) {
         this.extension = extension;
         this.saveDirectory = Path.of(System.getProperty("user.dir"), "repository", extension);
         try {
@@ -53,13 +53,12 @@ public abstract class FileBaseService<T extends Entity<T>, U extends BaseService
         }
     }
 
-    protected U getService() {
-        return service;
-    }
-
     @Override
     public T get(UUID id) {
-        return load(id);
+        if (hasId(id)) {
+            return load(id);
+        }
+        throw new IllegalArgumentException(ID_NOT_FOUND_MSG.formatted(extension, id));
     }
 
     @Override
@@ -70,7 +69,6 @@ public abstract class FileBaseService<T extends Entity<T>, U extends BaseService
 
     @Override
     public void update(UUID id, String newValue) {
-        service.update(id, newValue);
         T entity = get(id);
         entity.update(newValue);
         save(entity);
@@ -78,7 +76,6 @@ public abstract class FileBaseService<T extends Entity<T>, U extends BaseService
 
     @Override
     public void delete(UUID id) {
-        service.delete(id);
         Path path = saveDirectory.resolve(getFileName(id));
         try {
             Files.deleteIfExists(path);
@@ -93,6 +90,14 @@ public abstract class FileBaseService<T extends Entity<T>, U extends BaseService
 
     @Override
     public boolean hasId(UUID id) {
-        return service.hasId(id);
+        try (Stream<Path> fileList = Files.list(saveDirectory);) {
+            return fileList
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .map(fileName -> fileName.replace("." + extension, "")) // remove extension
+                    .anyMatch(entityId -> entityId.equals(id.toString()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
