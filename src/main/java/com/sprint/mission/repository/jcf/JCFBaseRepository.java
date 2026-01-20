@@ -3,10 +3,13 @@ package com.sprint.mission.repository.jcf;
 import com.sprint.mission.entity.Entity;
 import com.sprint.mission.repository.BaseRepository;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class JCFBaseRepository<T extends Entity<T>> implements BaseRepository<T> {
+public abstract class JCFBaseRepository<T extends Entity<T>> implements BaseRepository<T> {
     private final Map<UUID, T> data;
 
     public JCFBaseRepository() {
@@ -37,6 +40,11 @@ public class JCFBaseRepository<T extends Entity<T>> implements BaseRepository<T>
     @Override
     public void writeMany(Map<UUID, T> entities) {
         data.putAll(entities);
+    }
+
+    @Override
+    public void delete(UUID id) {
+        data.remove(id);
     }
 
     @Override
