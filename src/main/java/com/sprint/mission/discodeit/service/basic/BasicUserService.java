@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserServiceDTO;
+import com.sprint.mission.discodeit.dto.UserServiceDTO.UserCreation;
+import com.sprint.mission.discodeit.dto.UserServiceDTO.UserInfoUpdate;
+import com.sprint.mission.discodeit.dto.UserServiceDTO.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserPresence;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -34,54 +35,50 @@ public class BasicUserService implements UserService {
                         ID_NOT_FOUND.formatted("UserStatus", userStatusId)));
     }
 
-    private User find(UUID userId, UserPresence presence) {
-        User user = find(userId);
+    private User getUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        ID_NOT_FOUND.formatted("User", userId)));
+    }
+
+    private UserResponse getUserResponse(User user, UserStatus userStatus) {
+        return UserResponse.builder()
+                .userId(user.getId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .isActive(userStatus.isActive())
+                .build();
+    }
+
+    @Override
+    public UserResponse find(UUID userId) {
+        User user = getUser(userId);
         UserStatus userStatus = getUserStatus(user.getUserStatusId());
-        if (!userStatus.isSamePresence(presence)) {
-            throw new NoSuchElementException(
-                    "No matching user found, id: %s, presence: %s".formatted(userId, presence));
-        }
-        return user;
+        return getUserResponse(user, userStatus);
     }
 
     @Override
-    public User find(UserServiceDTO.UserFinding model) {
-        return find(model.userId(), model.presence());
-    }
-
-    @Override
-    public List<User> findAll(UserPresence presence) {
+    public List<UserResponse> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> find(user.getId(), presence))
+                .map(user -> find(user.getId()))
                 .toList();
     }
 
     @Override
-    public User create(UserServiceDTO.UserCreation model) {
+    public UserResponse create(UserCreation model) {
         BinaryContent profile = new BinaryContent(model.profileImageUrl());
         profileRepository.save(profile);
         UserStatus userStatus = new UserStatus();
         userStatusRepository.save(userStatus);
         User user = new User(model.username(), model.email(),
                 model.password(), profile.getId(), userStatus.getId());
-        return userRepository.save(user);
+        userRepository.save(user);
+        return getUserResponse(user, userStatus);
     }
 
     @Override
-    public User find(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException(
-                        ID_NOT_FOUND.formatted("User", userId)));
-    }
-
-    @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public User update(UserServiceDTO.UserInfoUpdate model) {
+    public UserResponse update(UserInfoUpdate model) {
         User user = userRepository.findById(model.userId())
                 .orElseThrow(() -> new NoSuchElementException(
                         ID_NOT_FOUND.formatted("User", model.userId())));
@@ -91,7 +88,9 @@ public class BasicUserService implements UserService {
                         ID_NOT_FOUND.formatted("Profile", model.userId())));
         profile.setUrl(model.newUrl());
         profileRepository.save(profile);
-        return userRepository.save(user);
+        userRepository.save(user);
+        UserStatus userStatus = getUserStatus(user.getUserStatusId());
+        return getUserResponse(user, userStatus);
     }
 
     @Override

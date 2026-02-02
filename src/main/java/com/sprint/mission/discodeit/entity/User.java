@@ -21,8 +21,10 @@ public class User implements Serializable {
     private Long updatedAt = createdAt;
     //
     @NonNull
+    @Getter
     private String username;
     @NonNull
+    @Getter
     private String email;
     @NonNull
     private String password;
