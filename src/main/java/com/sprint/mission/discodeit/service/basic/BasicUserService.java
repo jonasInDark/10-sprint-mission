@@ -11,7 +11,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,11 +20,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
-    @Qualifier("JCFUserRepository")
     private final UserRepository userRepository;
-    @Qualifier("JCFBinaryContentRepository")
     private final BinaryContentRepository profileRepository;
-    @Qualifier("JCFUserStatusRepository")
     private final UserStatusRepository userStatusRepository;
     private final String ID_NOT_FOUND = "%s with id %s not found";
 
@@ -41,7 +37,7 @@ public class BasicUserService implements UserService {
                         ID_NOT_FOUND.formatted("User", userId)));
     }
 
-    private UserResponse getUserResponse(User user, UserStatus userStatus) {
+    private UserResponse toResponse(User user, UserStatus userStatus) {
         return UserResponse.builder()
                 .userId(user.getId())
                 .username(user.getUsername())
@@ -56,14 +52,14 @@ public class BasicUserService implements UserService {
                 .filter(user1 -> user1.isCorrectPassword(password))
                 .findFirst().orElseThrow(() -> new NoSuchElementException("incorrect username or password"));
         UserStatus userStatus = getUserStatus(user.getUserStatusId());
-        return getUserResponse(user, userStatus);
+        return toResponse(user, userStatus);
     }
 
     @Override
     public UserResponse find(UUID userId) {
         User user = getUser(userId);
         UserStatus userStatus = getUserStatus(user.getUserStatusId());
-        return getUserResponse(user, userStatus);
+        return toResponse(user, userStatus);
     }
 
     @Override
@@ -83,7 +79,7 @@ public class BasicUserService implements UserService {
         User user = new User(model.username(), model.email(),
                 model.password(), profile.getId(), userStatus.getId());
         userRepository.save(user);
-        return getUserResponse(user, userStatus);
+        return toResponse(user, userStatus);
     }
 
     @Override
@@ -99,7 +95,7 @@ public class BasicUserService implements UserService {
         profileRepository.save(profile);
         userRepository.save(user);
         UserStatus userStatus = getUserStatus(user.getUserStatusId());
-        return getUserResponse(user, userStatus);
+        return toResponse(user, userStatus);
     }
 
     @Override

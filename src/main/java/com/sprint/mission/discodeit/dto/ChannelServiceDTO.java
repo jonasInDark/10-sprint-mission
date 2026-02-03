@@ -17,6 +17,6 @@ public interface ChannelServiceDTO {
 
     @Builder
     record ChannelResponse(UUID channelId, String channelName, String description, ChannelType type,
-                           long lastMessageTime, List<UUID> joinedUserIds) {
+                           long lastMessageTime, List<UUID> userIdsInChannel) {
     }
 }
