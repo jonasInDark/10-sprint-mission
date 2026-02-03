@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface UserServiceDTO {
     record UserCreation(@NonNull String username, @NonNull String email, @NonNull String password,
-                        String profileImageUrl) {
+                        String profileImageUrl, long lastActiveAt) {
         public UserCreation {
             if (username.equals(email)) {
                 throw new IllegalArgumentException(

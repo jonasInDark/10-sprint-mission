@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentServiceDTO.BinaryContentResponse;
 import com.sprint.mission.discodeit.dto.UserServiceDTO.UserCreation;
 import com.sprint.mission.discodeit.dto.UserServiceDTO.UserInfoUpdate;
 import com.sprint.mission.discodeit.dto.UserServiceDTO.UserResponse;
@@ -74,10 +75,11 @@ public class BasicUserService implements UserService {
     public UserResponse create(UserCreation model) {
         BinaryContent profile = new BinaryContent(model.profileImageUrl());
         profileRepository.save(profile);
-        UserStatus userStatus = new UserStatus();
+        UserStatus userStatus = new UserStatus(model.lastActiveAt());
         userStatusRepository.save(userStatus);
+        BinaryContentResponse profileDTO = profile.toResponse();
         User user = new User(model.username(), model.email(),
-                model.password(), profile.getId(), userStatus.getId());
+                model.password(), profileDTO.id(), userStatus.getId());
         userRepository.save(user);
         return toResponse(user, userStatus);
     }
