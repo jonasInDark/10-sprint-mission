@@ -20,13 +20,17 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BasicReadStatusService implements ReadStatusService {
+    private final String ID_NOT_FOUND = "ReadStatus with id, %s, not found";
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
     @Override
     public List<ReadStatusResponse> findAllByUserId(UUID userId) {
-        return List.of();
+        return readStatusRepository.findByUserId(userId)
+                .stream()
+                .map(ReadStatus::toResponse)
+                .toList();
     }
 
     @Override
@@ -52,23 +56,38 @@ public class BasicReadStatusService implements ReadStatusService {
                 .anyMatch(status -> status.matchUserId(userId) && status.matchChannelId(channelId));
     }
 
+    private ReadStatus findReadStatus(UUID id) {
+        return readStatusRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ID_NOT_FOUND.formatted(id)));
+    }
+
     @Override
     public ReadStatusResponse find(UUID id) {
-        return null;
+        return findReadStatus(id).toResponse();
     }
 
     @Override
     public List<ReadStatusResponse> findAll() {
-        return List.of();
+        return readStatusRepository.findAll()
+                .stream()
+                .map(ReadStatus::toResponse)
+                .toList();
     }
 
     @Override
     public ReadStatusResponse update(ReadStatusUpdate model) {
-        return null;
+        ReadStatus status = findReadStatus(model.id());
+        status.update(model.type());
+        readStatusRepository.save(status);
+        return status.toResponse();
     }
 
     @Override
     public void delete(UUID id) {
-
+        if (readStatusRepository.existsById(id)) {
+            readStatusRepository.deleteById(id);
+            return;
+        }
+        throw new NoSuchElementException(ID_NOT_FOUND.formatted(id));
     }
 }

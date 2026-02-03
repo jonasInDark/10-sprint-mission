@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface ReadStatusServiceDTO {
     record ReadStatusCreation(@NonNull UUID userId, @NonNull UUID channelId) {}
-    record ReadStatusUpdate(UUID id, UUID userId, UUID channelId, ReadType type) {}
+    record ReadStatusUpdate(@NonNull UUID id, @NonNull ReadType type) {}
     @Builder
     record ReadStatusResponse(UUID id, UUID userId, UUID channelId, ReadType type) {}
 }
