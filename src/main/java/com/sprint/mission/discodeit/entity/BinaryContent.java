@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.dto.BinaryContentServiceDTO.BinaryContentCreation;
 import com.sprint.mission.discodeit.dto.BinaryContentServiceDTO.BinaryContentResponse;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
@@ -20,6 +19,10 @@ public class BinaryContent implements Serializable {
     private final String fileName;
     private final String fileType;
     private final byte[] data;
+
+    public BinaryContent(BinaryContentCreation model) {
+        this(model.fileName(), model.fileType(), model.data());
+    }
 
     public BinaryContentResponse toResponse() {
         return BinaryContentResponse.builder()
