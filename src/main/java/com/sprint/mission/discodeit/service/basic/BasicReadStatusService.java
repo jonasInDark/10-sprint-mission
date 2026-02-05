@@ -35,25 +35,20 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public ReadStatusResponse create(ReadStatusCreation model) {
+        // todo: refactoring
         if (!userRepository.existsById(model.userId())) {
             throw new NoSuchElementException("User with id, %s, not found".formatted(model.userId()));
         }
         if (!channelRepository.existsById(model.channelId())) {
             throw new NoSuchElementException("Channel with id, %s, not found".formatted(model.channelId()));
         }
-        if (hasReadStatus(model.userId(), model.channelId())) {
+        if (readStatusRepository.existsByUserAndChannelId(model.userId(), model.channelId())) {
             throw new IllegalStateException(
                     "read status entity exist already containing (user id: %s, channel id: %s)".formatted(model.userId(), model.channelId()));
         }
         ReadStatus status = new ReadStatus(model.userId(), model.channelId());
         readStatusRepository.save(status);
         return status.toResponse();
-    }
-
-    private boolean hasReadStatus(UUID userId, UUID channelId) {
-        return readStatusRepository.findAll()
-                .stream()
-                .anyMatch(status -> status.matchUserId(userId) && status.matchChannelId(channelId));
     }
 
     private ReadStatus findReadStatus(UUID id) {
@@ -64,14 +59,6 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatusResponse find(UUID id) {
         return findReadStatus(id).toResponse();
-    }
-
-    @Override
-    public List<ReadStatusResponse> findAll() {
-        return readStatusRepository.findAll()
-                .stream()
-                .map(ReadStatus::toResponse)
-                .toList();
     }
 
     @Override

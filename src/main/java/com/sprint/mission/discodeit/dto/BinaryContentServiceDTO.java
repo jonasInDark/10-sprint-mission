@@ -1,14 +1,16 @@
 package com.sprint.mission.discodeit.dto;
 
 import lombok.Builder;
+import lombok.NonNull;
 
 import java.util.UUID;
 
 public interface BinaryContentServiceDTO {
-    static BinaryContentCreation getEmptyCreation() {
-        return new BinaryContentCreation(null, null, null);
+    record BinaryContentCreation(@NonNull String fileName, @NonNull String fileType, @NonNull byte[] data) {
     }
-    record BinaryContentCreation(String fileName, String fileType, byte[] data) {}
+
     @Builder
-    record BinaryContentResponse(UUID id, String fileName, String fileType, byte[] data) {}
+    record BinaryContentResponse(@NonNull UUID id, @NonNull String fileName, @NonNull String fileType,
+                                 @NonNull byte[] data) {
+    }
 }

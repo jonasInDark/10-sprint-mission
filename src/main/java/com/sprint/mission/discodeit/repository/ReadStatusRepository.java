@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface ReadStatusRepository extends DomainRepository<ReadStatus> {
     List<ReadStatus> findByChannelId(UUID channelId);
     List<ReadStatus> findByUserId(UUID userId);
+    boolean existsByUserAndChannelId(UUID userId, UUID channelId);
 }
