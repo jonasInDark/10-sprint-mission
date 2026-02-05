@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.dto.MessageServiceDTO.MessageResponse;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.Nonnull;
+import lombok.Builder;
 import lombok.ToString;
 
 import java.io.Serial;
@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-@RequiredArgsConstructor
 @ToString
 public class Message implements Serializable, Comparable<Message> {
     @Serial
@@ -23,15 +22,21 @@ public class Message implements Serializable, Comparable<Message> {
     private final long createdAt = Instant.now().getEpochSecond();
     private long updatedAt = createdAt;
     //
-    @NonNull
     private String content;
-    @NonNull
-    private UUID channelId;
-    @NonNull
-    private UUID authorId;
+    private final UUID channelId;
+    private final UUID authorId;
     // BinaryContent id list
     @ToString.Exclude
     private final Set<UUID> attachmentIds = new HashSet<>();
+
+    @Builder
+    public Message(@Nonnull String content, @Nonnull UUID channelId, @Nonnull UUID authorId,
+                   @Nonnull List<UUID> attachmentIds) {
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds.addAll(attachmentIds);
+    }
 
     public boolean isAuthor(UUID userId) {
         return this.authorId.equals(userId);
@@ -41,15 +46,15 @@ public class Message implements Serializable, Comparable<Message> {
         return this.channelId.equals(channelId);
     }
 
-    public void update(String newContent, List<UUID> attachments) {
+    public void update(String newContent, List<UUID> attachmentIds) {
         boolean anyValueUpdated = false;
         if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
             anyValueUpdated = true;
         }
 
-        if (attachments != null && !attachments.isEmpty()) {
-            this.attachmentIds.addAll(attachments);
+        if (attachmentIds != null && !attachmentIds.isEmpty()) {
+            this.attachmentIds.addAll(attachmentIds);
             anyValueUpdated = true;
         }
 
