@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -13,11 +14,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @ToString
 public class UserStatus implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     private final long ACTIVE_THRESHOLD = 300L;
 
     @Getter
     private final UUID id = UUID.randomUUID();
+    private final UUID userId;
     private final long createdAt = Instant.now().getEpochSecond();
     private long updatedAt = createdAt;
     @Getter
@@ -35,6 +38,6 @@ public class UserStatus implements Serializable {
     }
 
     public UserStatusResponse toResponse() {
-        return new UserStatusResponse(id, lastActiveAt);
+        return new UserStatusResponse(id, userId, lastActiveAt);
     }
 }

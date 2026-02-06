@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -25,29 +26,17 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusResponse create(UserStatusCreation model) {
         User user = findUser(model.userId());
-        if (userStatusRepository.existsById(user.getProfileId())) {
-            throw new IllegalStateException("User profile exist already");
+        if (userStatusRepository.existsByUserId(user.getId())) {
+            throw new IllegalArgumentException("UserStatus already exist");
         }
-        UserStatus status = new UserStatus(model.lastActiveAt());
+        UserStatus status = new UserStatus(user.getId(), model.lastActiveAt());
         userStatusRepository.save(status);
         return status.toResponse();
     }
 
-    private User findUser(UUID userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException(
-                        ID_NOT_FOUND.formatted("User", userId)));
-    }
-
-    private UserStatus findUserStatus(UUID id) {
-        return userStatusRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(
-                        ID_NOT_FOUND.formatted("User Profile", id)));
-    }
-
     @Override
     public UserStatusResponse find(UUID id) {
-        return findUserStatus(id).toResponse();
+        return findById(id).toResponse();
     }
 
     @Override
@@ -60,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponse update(UserStatusUpdate model) {
-        UserStatus status = findUserStatus(model.id());
+        UserStatus status = findById(Objects.requireNonNull(model.id()));
         status.update(model.lastActiveAt());
         userStatusRepository.save(status);
         return status.toResponse();
@@ -68,9 +57,10 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatusResponse updateByUserId(UserStatusUpdate model) {
-        User user = findUser(model.userId());
-        UserStatusUpdate updateDTO = new UserStatusUpdate(user.getProfileId(), model.userId(), model.lastActiveAt());
-        return update(updateDTO);
+        UserStatus status = findByUserId(Objects.requireNonNull(model.userId()));
+        status.update(model.lastActiveAt());
+        userStatusRepository.save(status);
+        return status.toResponse();
     }
 
     @Override
@@ -80,5 +70,23 @@ public class BasicUserStatusService implements UserStatusService {
                     ID_NOT_FOUND.formatted("User Profile", id));
         }
         userStatusRepository.deleteById(id);
+    }
+
+    private User findUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        ID_NOT_FOUND.formatted("User", userId)));
+    }
+
+    private UserStatus findById(UUID id) {
+        return userStatusRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        ID_NOT_FOUND.formatted("User Profile", id)));
+    }
+
+    private UserStatus findByUserId(UUID userId) {
+        return userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new NoSuchElementException(
+                        ID_NOT_FOUND.formatted("User Profile", userId)));
     }
 }
